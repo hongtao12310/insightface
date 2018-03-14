@@ -4,7 +4,7 @@ import face_embedding
 import argparse
 import cv2
 import numpy as np
-import os, sys
+import os, sys, time, datetime
 
 parser = argparse.ArgumentParser(description='face model test')
 # general
@@ -65,6 +65,7 @@ if __name__ == '__main__':
     not_detect = 0
     model = face_embedding.FaceModel(args)
 
+    tbegin = time.time()
     for tp, folder in FACE_DATA.items():
         print("===========dataset %s===========" % tp)
         # find age for a Face
@@ -91,11 +92,12 @@ if __name__ == '__main__':
                     or tp == "train" and train_index == 10 :
                 break
 
-        print("total detected: %d faces. only %d faces was not detected" % (total, not_detect))
+    tend = time.time()
+    tstr = str(datetime.timedelta(seconds=tend-tbegin))
+    print("time eclipse: %s" % tstr)
+    print("total detected: %d faces. only %d faces was not detected" % (total, not_detect))
 
-
-
-        # f2 = np.load("./vectors.npy")
+    # f2 = np.load("./vectors.npy")
         # print(f2.shape)
         # print(type(f2))
         # print(f2[0])
