@@ -244,7 +244,6 @@ class MtcnnDetector(object):
         #     total_boxes.extend(local_boxes)
 
         for batch in sliced_index:
-            print("batch: ", batch)
             local_boxes = detect_first_stage(img, self.PNet, scales[batch[0]], self.threshold[0])
             # print("local boxes: ", local_boxes)
             if local_boxes is not None:
