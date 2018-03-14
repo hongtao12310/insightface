@@ -75,8 +75,8 @@ class FaceModel:
     nimg = face_preprocess.preprocess(face_img, bbox, points, image_size='112,112')
 
     # save image
-    fPath = os.path.join(IMG_OUTPUT, tp, fname + ".jpg")
-    cv2.imwrite(fPath, nimg)
+    # fPath = os.path.join(IMG_OUTPUT, tp, fname + ".jpg")
+    # cv2.imwrite(fPath, nimg)
 
     nimg = cv2.cvtColor(nimg, cv2.COLOR_BGR2RGB)
     aligned = np.transpose(nimg, (2,0,1))

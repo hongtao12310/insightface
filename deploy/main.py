@@ -9,7 +9,7 @@ import os, sys, time, datetime
 parser = argparse.ArgumentParser(description='face model test')
 # general
 parser.add_argument('--image-size', default='112,112', help='')
-parser.add_argument('--model', default='../models/model-r18-amf/model,0', help='path to load model.')
+parser.add_argument('--model', default='../models/model-r50-am-lfw/model,0', help='path to load model.')
 parser.add_argument('--ctx', default='cpu,0', type=str, help='context cpu or gpu')
 parser.add_argument('--det', default=2, type=int, help='mtcnn option, 2 means using R+O, else using O')
 parser.add_argument('--flip', default=0, type=int, help='whether do lr flip aug')
@@ -49,7 +49,7 @@ FACE_DATA = {
     "train": "../datasets/megaage_asian/train",
 }
 
-VEC_OUTPUT = "../outputs/vectors"
+VEC_OUTPUT = "../outputs/vectors_50"
 IMG_OUTPUT = "../outputs/images"
 
 gender = "X"
@@ -88,14 +88,14 @@ if __name__ == '__main__':
             else:
                 save_numpy_array(fPath, vec)
 
-            if tp == "test" and test_index == 10 \
-                    or tp == "train" and train_index == 10 :
-                break
+            # if tp == "test" and test_index == 10 \
+            #         or tp == "train" and train_index == 10 :
+            #     break
 
     tend = time.time()
     tstr = str(datetime.timedelta(seconds=tend-tbegin))
     print("time eclipse: %s" % tstr)
-    print("total detected: %d faces. only %d faces was not detected" % (total, not_detect))
+    print("total faces: %d. only %d faces was not detected" % (total, not_detect))
 
     # f2 = np.load("./vectors.npy")
         # print(f2.shape)
