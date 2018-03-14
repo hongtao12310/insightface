@@ -43,7 +43,7 @@ class FaceModel:
     prefix = _vec[0]
     epoch = int(_vec[1])
     print('loading',prefix, epoch)
-    ctx = mx.gpu(args.gpu)
+    ctx = mx.cpu()
     sym, arg_params, aux_params = mx.model.load_checkpoint(prefix, epoch)
     all_layers = sym.get_internals()
     sym = all_layers['fc1_output']
@@ -53,13 +53,14 @@ class FaceModel:
     model.set_params(arg_params, aux_params)
     self.model = model
     mtcnn_path = os.path.join(os.path.dirname(__file__), 'mtcnn-model')
-    detector = MtcnnDetector(model_folder=mtcnn_path, ctx=ctx, num_worker=1, accurate_landmark = True, threshold=[0.0,0.0,0.2])
+    detector = MtcnnDetector(model_folder=mtcnn_path, ctx=ctx, num_worker=1, accurate_landmark = True, threshold=[0.7, 0.6, 0.6])
     self.detector = detector
 
 
   def get_feature(self, face_img):
     #face_img is bgr image
-    ret = self.detector.detect_face_limited(face_img, det_type = self.args.det)
+    ret = self.detector.detect_face(face_img)
+    # ret = self.detector.detect_face_limited(face_img, det_type = self.args.det)
     if ret is None:
       return None
     bbox, points = ret
