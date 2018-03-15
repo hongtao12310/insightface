@@ -49,14 +49,14 @@ class MtcnnDetector(object):
         models = ['det1', 'det2', 'det3','det4']
         models = [ os.path.join(model_folder, f) for f in models]
         
-        # self.PNets = []
-        # for i in range(num_worker):
-        #     workner_net = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
-        #     self.PNets.append(workner_net)
-        #
-        # self.Pool = Pool(num_worker)
+        self.PNets = []
+        for i in range(num_worker):
+            workner_net = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
+            self.PNets.append(workner_net)
 
-        self.PNet = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
+        self.Pool = Pool(num_worker)
+
+        # self.PNet = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
         self.RNet = mx.model.FeedForward.load(models[1], 1, ctx=ctx)
         self.ONet = mx.model.FeedForward.load(models[2], 1, ctx=ctx)
         self.LNet = mx.model.FeedForward.load(models[3], 1, ctx=ctx)
@@ -216,7 +216,7 @@ class MtcnnDetector(object):
         total_boxes = []
 
         height, width, _ = img.shape
-        minl = min( height, width)
+        minl = min(height, width)
 
         # get all the valid scales
         scales = []
@@ -237,17 +237,19 @@ class MtcnnDetector(object):
         #        total_boxes.append(return_boxes)
         
         sliced_index = self.slice_index(len(scales))
+        print("scales: %s" % scales)
+        print("sliced_index: %s" % sliced_index)
         total_boxes = []
-        # for batch in sliced_index:
-        #     local_boxes = self.Pool.map( detect_first_stage_warpper, \
-        #             izip(repeat(img), self.PNets[:len(batch)], [scales[i] for i in batch], repeat(self.threshold[0])) )
-        #     total_boxes.extend(local_boxes)
-
         for batch in sliced_index:
-            local_boxes = detect_first_stage(img, self.PNet, scales[batch[0]], self.threshold[0])
-            # print("local boxes: ", local_boxes)
-            if local_boxes is not None:
-                total_boxes.extend(local_boxes)
+            local_boxes = self.Pool.map( detect_first_stage_warpper, \
+                    izip(repeat(img), self.PNets[:len(batch)], [scales[i] for i in batch], repeat(self.threshold[0])) )
+            total_boxes.extend(local_boxes)
+
+        # for batch in sliced_index:
+        #     local_boxes = detect_first_stage(img, self.PNet, scales[batch[0]], self.threshold[0])
+        #     # print("local boxes: ", local_boxes)
+        #     if local_boxes is not None:
+        #         total_boxes.extend(local_boxes)
 
         # remove the Nones 
         total_boxes = [ i for i in total_boxes if i is not None]

@@ -97,18 +97,3 @@ if __name__ == '__main__':
     print("time eclipse: %s" % tstr)
     print("total faces: %d. only %d faces was not detected" % (total, not_detect))
 
-    # f2 = np.load("./vectors.npy")
-        # print(f2.shape)
-        # print(type(f2))
-        # print(f2[0])
-
-        # np.savetxt("./vectors.out", f1, fmt="%f",  delimiter=',')
-
-        # img = cv2.imread('/raid5data/dplearn/megaface/facescrubr/112x112/Tom_Hanks/Tom_Hanks_54733.png')
-        # f2 = model.get_feature(img)
-        # dist = np.sum(np.square(f1-f2))
-        # print(dist)
-        # sim = np.dot(f1, f2.T)
-        # print(sim)
-        #diff = np.subtract(source_feature, target_feature)
-        #dist = np.sum(np.square(diff),1)

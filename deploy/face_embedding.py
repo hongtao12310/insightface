@@ -55,7 +55,7 @@ class FaceModel:
     model.set_params(arg_params, aux_params)
     self.model = model
     mtcnn_path = os.path.join(os.path.dirname(__file__), 'mtcnn-model')
-    detector = MtcnnDetector(model_folder=mtcnn_path, ctx=ctx, num_worker=1, accurate_landmark = True, threshold=[0.7, 0.6, 0.6])
+    detector = MtcnnDetector(model_folder=mtcnn_path, ctx=ctx, num_worker=4, accurate_landmark = True, threshold=[0.7, 0.6, 0.6])
     self.detector = detector
 
   def get_feature(self, face_img, tp, fname):
@@ -73,11 +73,6 @@ class FaceModel:
     #print(points)
     #face_img BGR
     nimg = face_preprocess.preprocess(face_img, bbox, points, image_size='112,112')
-
-    # save image
-    # fPath = os.path.join(IMG_OUTPUT, tp, fname + ".jpg")
-    # cv2.imwrite(fPath, nimg)
-
     nimg = cv2.cvtColor(nimg, cv2.COLOR_BGR2RGB)
     aligned = np.transpose(nimg, (2,0,1))
     #print(nimg.shape)
