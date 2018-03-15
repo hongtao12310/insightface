@@ -52,7 +52,8 @@ class MtcnnDetector(object):
         
         self.PNets = []
         for i in range(num_worker):
-            worker_net = mx.mod.Module.load(models[0], 1, context=ctx, label_names=None)
+            # worker_net = mx.mod.Module.load(models[0], 1, context=ctx, label_names=None)
+            worker_net = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
             self.PNets.append(worker_net)
 
         self.Pool = Pool(num_worker)
@@ -68,7 +69,6 @@ class MtcnnDetector(object):
         self.minsize   = float(minsize)
         self.factor    = float(factor)
         self.threshold = threshold
-
 
     def convert_to_square(self, bbox):
         """
@@ -252,7 +252,7 @@ class MtcnnDetector(object):
         results = []
         for batch in sliced_index:
             for i in batch:
-                result = self.Pool.apply_async(detect_first_stage, args=(img, scales[i], self.threshold[0]))
+                result = self.Pool.apply_async(detect_first_stage, args=(img, self.PNets[0], scales[i], self.threshold[0]))
                 results.append(result)
 
         self.Pool.close()

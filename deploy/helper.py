@@ -129,7 +129,7 @@ def generate_bbox(map, reg, scale, threshold):
      return boundingbox.T
 
 
-def detect_first_stage(img, scale, threshold):
+def detect_first_stage(img, pnet, scale, threshold):
     """
         run PNet for first stage
     
@@ -151,15 +151,10 @@ def detect_first_stage(img, scale, threshold):
     
     im_data = cv2.resize(img, (ws, hs))
 
-    import mxnet as mx
-    # worker_net = mx.mod.Module.load("./mtcnn-model/det1", 1, context=mx.cpu(), label_names=None)
-    worker_net = mx.model.FeedForward.load("/Users/hongtaozhang/workspace/machine-learning/face_detect/insightface/deploy/mtcnn-model/det1", 1, ctx=mx.cpu())
-
-    print(worker_net)
     # adjust for the network input
     input_buf = adjust_input(im_data)
     print("=======before predict========")
-    output = worker_net.predict(input_buf)
+    output = pnet.predict(input_buf)
     print("=======after predict========")
     print("output type: %s" % type(output))
     # print(output)
