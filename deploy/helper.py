@@ -145,6 +145,7 @@ def detect_first_stage(img, net, scale, threshold):
     -------
         total_boxes : bboxes
     """
+    print("========enter detect_first_stage======")
     height, width, _ = img.shape
     hs = int(math.ceil(height * scale))
     ws = int(math.ceil(width * scale))
@@ -153,7 +154,11 @@ def detect_first_stage(img, net, scale, threshold):
     
     # adjust for the network input
     input_buf = adjust_input(im_data)
+    print("=======before predict========")
     output = net.predict(input_buf)
+    print("=======after predict========")
+    print("output type: %s" % type(output))
+    # print(output)
     boxes = generate_bbox(output[1][0,1,:,:], output[0], scale, threshold)
 
     if boxes.size == 0:

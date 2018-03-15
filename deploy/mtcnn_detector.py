@@ -47,12 +47,12 @@ class MtcnnDetector(object):
 
         # load 4 models from folder
         models = ['det1', 'det2', 'det3','det4']
-        models = [ os.path.join(model_folder, f) for f in models]
+        models = [os.path.join(model_folder, f) for f in models]
         
         self.PNets = []
         for i in range(num_worker):
-            workner_net = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
-            self.PNets.append(workner_net)
+            worker_net = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
+            self.PNets.append(worker_net)
 
         self.Pool = Pool(num_worker)
 
@@ -240,10 +240,27 @@ class MtcnnDetector(object):
         print("scales: %s" % scales)
         print("sliced_index: %s" % sliced_index)
         total_boxes = []
+        # for batch in sliced_index:
+        #     local_boxes = self.Pool.map( detect_first_stage_warpper, \
+        #             izip(repeat(img), self.PNets[:len(batch)], [scales[i] for i in batch], repeat(self.threshold[0])) )
+        #     total_boxes.extend(local_boxes)
+
+        results = []
         for batch in sliced_index:
-            local_boxes = self.Pool.map( detect_first_stage_warpper, \
-                    izip(repeat(img), self.PNets[:len(batch)], [scales[i] for i in batch], repeat(self.threshold[0])) )
-            total_boxes.extend(local_boxes)
+            for i in batch:
+                result = self.Pool.apply_async(detect_first_stage, args=(img, self.PNets[0], scales[i], self.threshold[0]))
+                results.append(result)
+
+        self.Pool.close()
+        self.Pool.join()
+
+        for result in results:
+            box = result.get()
+            if box is not None:
+                total_boxes.extend(box)
+            # local_boxes = self.Pool.map( detect_first_stage_warpper, \
+            #         izip(repeat(img), self.PNets[:len(batch)], [scales[i] for i in batch], repeat(self.threshold[0])) )
+            # total_boxes.extend(local_boxes)
 
         # for batch in sliced_index:
         #     local_boxes = detect_first_stage(img, self.PNet, scales[batch[0]], self.threshold[0])
@@ -252,7 +269,7 @@ class MtcnnDetector(object):
         #         total_boxes.extend(local_boxes)
 
         # remove the Nones 
-        total_boxes = [ i for i in total_boxes if i is not None]
+        total_boxes = [i for i in total_boxes if i is not None]
 
         if len(total_boxes) == 0:
             return None

@@ -67,8 +67,8 @@ class FaceModel:
     bbox, points = ret
     if bbox.shape[0]==0:
       return None
-    bbox = bbox[0,0:4]
-    points = points[0,:].reshape((2,5)).T
+    bbox = bbox[0, 0:4]
+    points = points[0, :].reshape((2,5)).T
     #print(bbox)
     #print(points)
     #face_img BGR
