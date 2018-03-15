@@ -9,6 +9,7 @@ from itertools import repeat
 from itertools import izip
 from helper import nms, adjust_input, generate_bbox, detect_first_stage, detect_first_stage_warpper
 
+
 class MtcnnDetector(object):
     """
         Joint Face Detection and Alignment using Multi-task Cascaded Convolutional Neural Networks
@@ -46,12 +47,12 @@ class MtcnnDetector(object):
         self.accurate_landmark = accurate_landmark
 
         # load 4 models from folder
-        models = ['det1', 'det2', 'det3','det4']
+        models = ['det1', 'det2', 'det3', 'det4']
         models = [os.path.join(model_folder, f) for f in models]
         
         self.PNets = []
         for i in range(num_worker):
-            worker_net = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
+            worker_net = mx.mod.Module.load(models[0], 1, context=ctx, label_names=None)
             self.PNets.append(worker_net)
 
         self.Pool = Pool(num_worker)
@@ -61,6 +62,9 @@ class MtcnnDetector(object):
         self.ONet = mx.model.FeedForward.load(models[2], 1, ctx=ctx)
         self.LNet = mx.model.FeedForward.load(models[3], 1, ctx=ctx)
 
+        # self.RNet = mx.mod.Module.load(models[1], 1, context=ctx)
+        # self.ONet = mx.mod.Module.load(models[2], 1, context=ctx)
+        # self.LNet = mx.mod.Module.load(models[3], 1, context=ctx)
         self.minsize   = float(minsize)
         self.factor    = float(factor)
         self.threshold = threshold
@@ -248,7 +252,7 @@ class MtcnnDetector(object):
         results = []
         for batch in sliced_index:
             for i in batch:
-                result = self.Pool.apply_async(detect_first_stage, args=(img, self.PNets[0], scales[i], self.threshold[0]))
+                result = self.Pool.apply_async(detect_first_stage, args=(img, scales[i], self.threshold[0]))
                 results.append(result)
 
         self.Pool.close()
