@@ -8,7 +8,8 @@ import sys
 if __name__ == '__main__':
     detector = MtcnnDetector(model_folder='./mtcnn-model', ctx=mx.cpu(0), num_worker=1, accurate_landmark=False)
 
-    img = cv2.imread('704.jpg')
+    img_path = "/Users/hongtaozhang/workspace/machine-learning/face_detect/imdb_crop/99/nm0000199_rm958041600_1940-4-25_1997.jpg"
+    img = cv2.imread(img_path)
 
     # run detector
     results = detector.detect_face(img)

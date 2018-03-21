@@ -61,7 +61,7 @@ class FaceModel:
                                  threshold=[0.7, 0.6, 0.6])
         self.detector = detector
 
-    def get_feature(self, face_img, tp, fname):
+    def get_feature(self, face_img, opath):
         # face_img is bgr image
         ret = self.detector.detect_face(face_img)
         # ret = self.detector.detect_face_limited(face_img, det_type = self.args.det)
@@ -76,6 +76,7 @@ class FaceModel:
         # print(points)
         # face_img BGR
         nimg = face_preprocess.preprocess(face_img, bbox, points, image_size='112,112')
+        cv2.imwrite(opath, nimg)
         nimg = cv2.cvtColor(nimg, cv2.COLOR_BGR2RGB)
         aligned = np.transpose(nimg, (2, 0, 1))
         # print(nimg.shape)
@@ -95,5 +96,5 @@ class FaceModel:
                 embedding = _embedding
             else:
                 embedding += _embedding
-        embedding = sklearn.preprocessing.normalize(embedding).flatten()
-        return embedding
+        # embedding = sklearn.preprocessing.normalize(embedding).flatten()
+        return embedding.flatten()

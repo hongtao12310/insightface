@@ -51,15 +51,14 @@ class MtcnnDetector(object):
         models = ['det1', 'det2', 'det3', 'det4']
         models = [os.path.join(model_folder, f) for f in models]
 
-        self.PNets = []
-        for i in range(num_worker):
-            # worker_net = mx.mod.Module.load(models[0], 1, context=ctx, label_names=None)
-            worker_net = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
-            self.PNets.append(worker_net)
+        # self.PNets = []
+        # for i in range(num_worker):
+        #     worker_net = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
+        #     self.PNets.append(worker_net)
 
-        self.Pool = Pool(num_worker)
+        # self.Pool = Pool(num_worker)
 
-        # self.PNet = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
+        self.PNet = mx.model.FeedForward.load(models[0], 1, ctx=ctx)
         self.RNet = mx.model.FeedForward.load(models[1], 1, ctx=ctx)
         self.ONet = mx.model.FeedForward.load(models[2], 1, ctx=ctx)
         self.LNet = mx.model.FeedForward.load(models[3], 1, ctx=ctx)
@@ -250,29 +249,12 @@ class MtcnnDetector(object):
         #             izip(repeat(img), self.PNets[:len(batch)], [scales[i] for i in batch], repeat(self.threshold[0])) )
         #     total_boxes.extend(local_boxes)
 
-        results = []
         for batch in sliced_index:
             for i in batch:
-                result = self.Pool.apply_async(detect_first_stage, args=(img, self.PNets[0],
-                                                                         scales[i], self.threshold[0]))
-                results.append(result)
-
-        self.Pool.close()
-        self.Pool.join()
-
-        for result in results:
-            box = result.get()
-            if box is not None:
-                total_boxes.extend(box)
-            # local_boxes = self.Pool.map( detect_first_stage_warpper, \
-            #         izip(repeat(img), self.PNets[:len(batch)], [scales[i] for i in batch], repeat(self.threshold[0])) )
-            # total_boxes.extend(local_boxes)
-
-        # for batch in sliced_index:
-        #     local_boxes = detect_first_stage(img, self.PNet, scales[batch[0]], self.threshold[0])
-        #     # print("local boxes: ", local_boxes)
-        #     if local_boxes is not None:
-        #         total_boxes.extend(local_boxes)
+                local_boxes = detect_first_stage(img, self.PNet, scales[i], self.threshold[0])
+                # print("local boxes: ", local_boxes)
+                if local_boxes is not None:
+                    total_boxes.extend(local_boxes)
 
         # remove the Nones 
         total_boxes = [i for i in total_boxes if i is not None]
