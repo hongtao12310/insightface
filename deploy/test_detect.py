@@ -5,7 +5,6 @@ import cv2
 import mxnet as mx
 import sys
 
-
 if __name__ == '__main__':
     detector = MtcnnDetector(model_folder='./mtcnn-model', ctx=mx.cpu(0), num_worker=1, accurate_landmark=False)
 

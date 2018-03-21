@@ -36,7 +36,7 @@ def load_age_label(tp, path):
 
 
 def get_age(tp, fid):
-    return age_cache[tp][fid-1].strip('\n')
+    return age_cache[tp][fid - 1].strip('\n')
 
 
 AGE_LABEL = {
@@ -93,7 +93,6 @@ if __name__ == '__main__':
             #     break
 
     tend = time.time()
-    tstr = str(datetime.timedelta(seconds=tend-tbegin))
+    tstr = str(datetime.timedelta(seconds=tend - tbegin))
     print("time eclipse: %s" % tstr)
     print("total faces: %d. only %d faces was not detected" % (total, not_detect))
-
